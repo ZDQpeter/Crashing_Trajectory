@@ -1,0 +1,416 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# ==================================================
+
+# Define parameters
+v_0 = 235           # unit of m/s (pre-crashing speed)
+h_0 = 8870          # unit of m   (pre-crashing altitude)
+rho_air = 1.225     # unit of kg/m^3 (air density)
+c_d_plane = 0.0344  # Boeing 737-700 Drag Coefficient (https://dokumen.tips/documents/boeing-737-700-drag.html)
+A_plane = 45        # unit of m^2 (Boeing 737-700 Fuselage Cross-Section Area) (https://zhuanlan.zhihu.com/p/149417243)
+g = 9.8             # unit of m/s^2 (gravitational acceleration on Earth)
+m = 70535           # unit of kg (plane's mass max take-off)
+
+C_d = 0.5 * rho_air * c_d_plane * A_plane
+
+
+# 3-Figure plot
+plt.subplot(311)
+
+
+
+
+delta_t = 1       # unit of s (time interval for evaluation)
+plt.subplot(311)
+# ---------------- Calculations (Air-Resistance NOT considered) below -----------------------
+Vx = v_0
+Vy = 0
+V = np.sqrt(Vx**2 + Vy**2)
+theta = (np.arccos(Vx/V))*180/(np.pi)
+x = 0
+y = 0
+
+
+list_x = [x]
+list_y = [y]
+list_Vx = [Vx]
+list_Vy = [Vy]
+list_V = [V]
+list_theta = [theta]
+
+while True:
+
+    # xy-location after delta_t
+    x = x + Vx * delta_t
+    y = y + (Vy * delta_t + 0.5 * g * (delta_t**2))
+
+    list_x = np.append(list_x, x)
+    list_y = np.append(list_y, h_0 - y)
+
+
+    # xy-Speed after delta_t
+    Vx = Vx
+    Vy = Vy + g * delta_t
+    V = np.sqrt(Vx ** 2 + Vy ** 2)
+    theta = (np.arccos(Vx/V))*180/(np.pi)
+
+    list_Vx = np.append(list_Vx, Vx)
+    list_Vy = np.append(list_Vy, Vy)
+    list_V = np.append(list_V, V)
+    list_theta = np.append(list_theta, theta)
+
+    if (y > h_0):
+        break
+
+
+plt.plot(list_x[1:], list_y[1:], 'r.-', label="Air-Resistance NOT Considered")
+plt.text(6000, 6000, "Crashing Speed = " + str(list_V[-1]) + " m/s")
+plt.text(6000, 5500, "Crashing Azimuth Angle = " + str(list_theta[-1]) + " Deg")
+
+# ---------------- Calculations (Air-Resistance NOT considered) above -----------------------
+
+
+
+
+
+
+
+
+
+
+
+
+# ---------------- Calculations (Air-Resistance considered) below -----------------------
+Vx = v_0
+Vy = 0
+V = np.sqrt(Vx**2 + Vy**2)
+theta = (np.arccos(Vx/V))*180/(np.pi)
+x = 0
+y = 0
+
+
+list_x = [x]
+list_y = [y]
+list_Vx = [Vx]
+list_Vy = [Vy]
+list_V = [V]
+list_theta = [theta]
+
+while True:
+
+    # xy-location after delta_t
+    x = x + (Vx * delta_t - 0.5 * C_d * (V**2) * Vx * (delta_t**2) / (m * V))
+    y = y + (Vy * delta_t + 0.5 * (g - C_d * (V**2) * Vy/(V * m)) * (delta_t**2))
+
+    list_x = np.append(list_x, x)
+    list_y = np.append(list_y, h_0 - y)
+
+
+    # xy-Speed after delta_t
+    Vx = Vx - (C_d * (V**2) * Vx / (m * V)) * delta_t
+    Vy = Vy + (g - (C_d * (V**2) * Vy / (m * V))) * delta_t
+    V = np.sqrt(Vx**2 + Vy**2)
+    theta = (np.arccos(Vx / V)) * 180 / (np.pi)
+
+    list_Vx = np.append(list_Vx, Vx)
+    list_Vy = np.append(list_Vy, Vy)
+    list_V = np.append(list_V, V)
+    list_theta = np.append(list_theta, theta)
+
+    if (y > h_0):
+        break
+
+# plt.figure()
+plt.plot(list_x[1:], list_y[1:], 'b.-', label="Air-Resistance Considered")
+plt.text(4000, 2000, "Crashing Speed = " + str(list_V[-1]) + " m/s")
+plt.text(4000, 1500, "Crashing Azimuth Angle = " + str(list_theta[-1]) + " Deg")
+
+# plt.xlabel("x (m)")
+plt.ylabel("Altitude (m)")
+plt.legend()
+plt.title(r'$\Delta$T=%ss' %(delta_t))
+
+
+
+# ---------------- Calculations (Air-Resistance considered) above -----------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+delta_t = 0.1       # unit of s (time interval for evaluation)
+plt.subplot(312)
+# ---------------- Calculations (Air-Resistance NOT considered) below -----------------------
+Vx = v_0
+Vy = 0
+V = np.sqrt(Vx**2 + Vy**2)
+theta = (np.arccos(Vx/V))*180/(np.pi)
+x = 0
+y = 0
+
+
+list_x = [x]
+list_y = [y]
+list_Vx = [Vx]
+list_Vy = [Vy]
+list_V = [V]
+list_theta = [theta]
+
+while True:
+
+    # xy-location after delta_t
+    x = x + Vx * delta_t
+    y = y + (Vy * delta_t + 0.5 * g * (delta_t**2))
+
+    list_x = np.append(list_x, x)
+    list_y = np.append(list_y, h_0 - y)
+
+
+    # xy-Speed after delta_t
+    Vx = Vx
+    Vy = Vy + g * delta_t
+    V = np.sqrt(Vx ** 2 + Vy ** 2)
+    theta = (np.arccos(Vx/V))*180/(np.pi)
+
+    list_Vx = np.append(list_Vx, Vx)
+    list_Vy = np.append(list_Vy, Vy)
+    list_V = np.append(list_V, V)
+    list_theta = np.append(list_theta, theta)
+
+    if (y > h_0):
+        break
+
+
+plt.plot(list_x[1:], list_y[1:], 'r.-', label="Air-Resistance NOT Considered")
+plt.text(6000, 6000, "Crashing Speed = " + str(list_V[-1]) + " m/s")
+plt.text(6000, 5500, "Crashing Azimuth Angle = " + str(list_theta[-1]) + " Deg")
+
+# ---------------- Calculations (Air-Resistance NOT considered) above -----------------------
+
+
+
+
+
+
+
+
+
+
+
+
+# ---------------- Calculations (Air-Resistance considered) below -----------------------
+Vx = v_0
+Vy = 0
+V = np.sqrt(Vx**2 + Vy**2)
+theta = (np.arccos(Vx/V))*180/(np.pi)
+x = 0
+y = 0
+
+
+list_x = [x]
+list_y = [y]
+list_Vx = [Vx]
+list_Vy = [Vy]
+list_V = [V]
+list_theta = [theta]
+
+while True:
+
+    # xy-location after delta_t
+    x = x + (Vx * delta_t - 0.5 * C_d * (V**2) * Vx * (delta_t**2) / (m * V))
+    y = y + (Vy * delta_t + 0.5 * (g - C_d * (V**2) * Vy/(V * m)) * (delta_t**2))
+
+    list_x = np.append(list_x, x)
+    list_y = np.append(list_y, h_0 - y)
+
+
+    # xy-Speed after delta_t
+    Vx = Vx - (C_d * (V**2) * Vx / (m * V)) * delta_t
+    Vy = Vy + (g - (C_d * (V**2) * Vy / (m * V))) * delta_t
+    V = np.sqrt(Vx**2 + Vy**2)
+    theta = (np.arccos(Vx / V)) * 180 / (np.pi)
+
+    list_Vx = np.append(list_Vx, Vx)
+    list_Vy = np.append(list_Vy, Vy)
+    list_V = np.append(list_V, V)
+    list_theta = np.append(list_theta, theta)
+
+    if (y > h_0):
+        break
+
+# plt.figure()
+plt.plot(list_x[1:], list_y[1:], 'b.-', label="Air-Resistance Considered")
+plt.text(4000, 2000, "Crashing Speed = " + str(list_V[-1]) + " m/s")
+plt.text(4000, 1500, "Crashing Azimuth Angle = " + str(list_theta[-1]) + " Deg")
+
+# plt.xlabel("x (m)")
+plt.ylabel("Altitude (m)")
+plt.legend()
+plt.title(r'$\Delta$T=%ss' %(delta_t))
+
+
+
+# ---------------- Calculations (Air-Resistance considered) above -----------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+delta_t = 0.01       # unit of s (time interval for evaluation)
+plt.subplot(313)
+# ---------------- Calculations (Air-Resistance NOT considered) below -----------------------
+Vx = v_0
+Vy = 0
+V = np.sqrt(Vx**2 + Vy**2)
+theta = (np.arccos(Vx/V))*180/(np.pi)
+x = 0
+y = 0
+
+
+list_x = [x]
+list_y = [y]
+list_Vx = [Vx]
+list_Vy = [Vy]
+list_V = [V]
+list_theta = [theta]
+
+while True:
+
+    # xy-location after delta_t
+    x = x + Vx * delta_t
+    y = y + (Vy * delta_t + 0.5 * g * (delta_t**2))
+
+    list_x = np.append(list_x, x)
+    list_y = np.append(list_y, h_0 - y)
+
+
+    # xy-Speed after delta_t
+    Vx = Vx
+    Vy = Vy + g * delta_t
+    V = np.sqrt(Vx ** 2 + Vy ** 2)
+    theta = (np.arccos(Vx/V))*180/(np.pi)
+
+    list_Vx = np.append(list_Vx, Vx)
+    list_Vy = np.append(list_Vy, Vy)
+    list_V = np.append(list_V, V)
+    list_theta = np.append(list_theta, theta)
+
+    if (y > h_0):
+        break
+
+
+plt.plot(list_x[1:], list_y[1:], 'r.-', label="Air-Resistance NOT Considered")
+plt.text(6000, 6000, "Crashing Speed = " + str(list_V[-1]) + " m/s")
+plt.text(6000, 5500, "Crashing Azimuth Angle = " + str(list_theta[-1]) + " Deg")
+
+# ---------------- Calculations (Air-Resistance NOT considered) above -----------------------
+
+
+
+
+
+
+
+
+
+
+
+
+# ---------------- Calculations (Air-Resistance considered) below -----------------------
+Vx = v_0
+Vy = 0
+V = np.sqrt(Vx**2 + Vy**2)
+theta = (np.arccos(Vx/V))*180/(np.pi)
+x = 0
+y = 0
+
+
+list_x = [x]
+list_y = [y]
+list_Vx = [Vx]
+list_Vy = [Vy]
+list_V = [V]
+list_theta = [theta]
+
+while True:
+
+    # xy-location after delta_t
+    x = x + (Vx * delta_t - 0.5 * C_d * (V**2) * Vx * (delta_t**2) / (m * V))
+    y = y + (Vy * delta_t + 0.5 * (g - C_d * (V**2) * Vy/(V * m)) * (delta_t**2))
+
+    list_x = np.append(list_x, x)
+    list_y = np.append(list_y, h_0 - y)
+
+
+    # xy-Speed after delta_t
+    Vx = Vx - (C_d * (V**2) * Vx / (m * V)) * delta_t
+    Vy = Vy + (g - (C_d * (V**2) * Vy / (m * V))) * delta_t
+    V = np.sqrt(Vx**2 + Vy**2)
+    theta = (np.arccos(Vx / V)) * 180 / (np.pi)
+
+    list_Vx = np.append(list_Vx, Vx)
+    list_Vy = np.append(list_Vy, Vy)
+    list_V = np.append(list_V, V)
+    list_theta = np.append(list_theta, theta)
+
+    if (y > h_0):
+        break
+
+# plt.figure()
+plt.plot(list_x[1:], list_y[1:], 'b.-', label="Air-Resistance Considered")
+plt.text(4000, 2000, "Crashing Speed = " + str(list_V[-1]) + " m/s")
+plt.text(4000, 1500, "Crashing Azimuth Angle = " + str(list_theta[-1]) + " Deg")
+
+plt.xlabel("x (m)")
+plt.ylabel("Altitude (m)")
+plt.legend()
+plt.title(r'$\Delta$T=%ss' %(delta_t))
+
+
+
+# ---------------- Calculations (Air-Resistance considered) above -----------------------
+
+
+
+plt.show()
